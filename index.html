@@ -78,7 +78,7 @@
   <script>
     (() => {
       const password = "deltarune"; // The password for login
-      let encryptionDateMultiplier = new Date().getDate(); // Store multiplier globally
+      const dateMultiplier = new Date().getDate(); // Store multiplier globally
 
       // Login function that shows the app if password is correct
       function login() {
@@ -102,12 +102,12 @@
           parts.push(parseInt(padded.substring(i, i + 5), 2));
         }
 
-        return parts.map(p => p * encryptionDateMultiplier).join(".");
+        return parts.map(p => p * dateMultiplier).join(".");
       }
 
       // Decrypt a Marcian cipher string to original text
       function fromMarcianBinary(code) {
-        const nums = code.split(".").map(n => parseInt(n) / encryptionDateMultiplier);
+        const nums = code.split(".").map(n => parseInt(n) / dateMultiplier);
         const binary = nums.map(n => n.toString(2).padStart(5, '0')).join("");
         const trimmed = binary.replace(/0+$/, ''); // Remove trailing zeros
         const decimal = parseInt(trimmed, 2);
