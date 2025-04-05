@@ -12,6 +12,11 @@
       font-family: 'Press Start 2P', monospace;
       text-align: center;
       padding: 20px;
+      margin: 0; /* Remove margin to avoid extra space */
+      height: 100vh; /* Ensure full viewport height */
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     h1, h2 {
@@ -28,6 +33,12 @@
       border: 2px solid white;
       margin: 5px;
       padding: 5px;
+    }
+
+    #login {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     #app {
@@ -58,7 +69,6 @@
     <p>Enter Password:</p>
     <input type="password" id="password" />
     <button id="loginButton">Enter</button>
-    <p id="loginStatus"></p>
   </div>
 
   <div id="app">
@@ -86,8 +96,6 @@
         if (enteredPassword === password) {
           document.getElementById("login").style.display = "none";
           document.getElementById("app").style.display = "block";
-        } else {
-          document.getElementById("loginStatus").innerText = "ACCESS DENIED";
         }
       }
 
@@ -122,5 +130,27 @@
         document.getElementById("output").innerText = encrypted;
       }
 
-      // Decrypt the input
+      // Decrypt the input text
+      function decrypt() {
+        const input = document.getElementById("inputText").value;
+        const segments = input.split("-");
+        const decrypted = segments.map(seg => fromMarcianBinary(seg)).join(" ");
+        document.getElementById("output").innerText = decrypted;
+      }
 
+      // Bind login to button click and Enter key
+      document.getElementById("loginButton").addEventListener("click", login);
+      document.getElementById("password").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+          login();
+        }
+      });
+
+      // Expose functions globally
+      window.login = login;
+      window.encrypt = encrypt;
+      window.decrypt = decrypt;
+    })();
+  </script>
+</body>
+</html>
