@@ -93,7 +93,7 @@
 
       // Encrypt a word to Marcian cipher
       function toMarcianBinary(word) {
-        const base36 = parseInt(word, 36).toString(2);
+        const base36 = parseInt(word, 36).toString(2); // Convert word to binary
         let padded = base36;
         while (padded.length % 5 !== 0) padded += "0"; // Pad to make the binary divisible by 5
 
@@ -107,11 +107,11 @@
 
       // Decrypt a Marcian cipher string to original text
       function fromMarcianBinary(code) {
-        const nums = code.split(".").map(n => parseInt(n) / dateMultiplier);
-        const binary = nums.map(n => n.toString(2).padStart(5, '0')).join("");
+        const nums = code.split(".").map(n => parseInt(n) / dateMultiplier); // Reverse the multiplication
+        const binary = nums.map(n => n.toString(2).padStart(5, '0')).join(""); // Convert to binary
         const trimmed = binary.replace(/0+$/, ''); // Remove trailing zeros
-        const decimal = parseInt(trimmed, 2);
-        return decimal.toString(36); // Convert back to base 36
+        const decimal = parseInt(trimmed, 2); // Convert back to decimal
+        return decimal.toString(36); // Convert to base-36
       }
 
       // Encrypt the input text
@@ -122,27 +122,5 @@
         document.getElementById("output").innerText = encrypted;
       }
 
-      // Decrypt the input text
-      function decrypt() {
-        const input = document.getElementById("inputText").value;
-        const segments = input.split("-");
-        const decrypted = segments.map(seg => fromMarcianBinary(seg)).join(" ");
-        document.getElementById("output").innerText = decrypted;
-      }
+      // Decrypt the input
 
-      // Bind login to button click and Enter key
-      document.getElementById("loginButton").addEventListener("click", login);
-      document.getElementById("password").addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-          login();
-        }
-      });
-
-      // Expose functions globally
-      window.login = login;
-      window.encrypt = encrypt;
-      window.decrypt = decrypt;
-    })();
-  </script>
-</body>
-</html>
