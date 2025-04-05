@@ -10,8 +10,16 @@
       background-color: #000;
       color: #fff;
       font-family: 'Press Start 2P', monospace;
+      cursor: url('https://cur.cursors-4u.net/games/gam-13/gam1277.cur'), auto;
       text-align: center;
       padding: 20px;
+    }
+
+    h1, h2 {
+      color: #fff;
+      border: 2px solid #fff;
+      padding: 10px;
+      display: inline-block;
     }
 
     input, textarea, button {
@@ -21,13 +29,6 @@
       border: 2px solid white;
       margin: 5px;
       padding: 5px;
-    }
-
-    h1, h2 {
-      color: #fff;
-      border: 2px solid #fff;
-      padding: 10px;
-      display: inline-block;
     }
 
     #app {
@@ -48,60 +49,48 @@
     audio {
       display: none;
     }
+
   </style>
 </head>
 <body>
   <h1>Undercryptor</h1>
 
-  <!-- LOGIN SECTION -->
   <div id="login">
-    <h2>Login to Access</h2>
+    <h2>LOGIN</h2>
     <p>Enter Password:</p>
     <input type="password" id="password" />
-    <button id="loginBtn">Enter</button>
+    <button id="loginButton">Enter</button>
     <p id="loginStatus"></p>
   </div>
 
-  <!-- MAIN APP -->
   <div id="app">
     <div class="section">
       <h2>Marcian Encryptor</h2>
       <textarea id="inputText" rows="4" cols="50" placeholder="Enter text..."></textarea><br>
-      <button id="encryptBtn">Encrypt</button>
-      <button id="decryptBtn">Decrypt</button>
+      <button onclick="encrypt()">Encrypt</button>
+      <button onclick="decrypt()">Decrypt</button>
       <div id="output"></div>
     </div>
   </div>
 
-  <!-- BACKGROUND MUSIC -->
   <audio autoplay loop>
     <source src="https://vgmsite.com/soundtracks/undertale/dtmnqkfkcq/56.%20Fallen%20Down%20(Reprise).mp3" type="audio/mpeg">
   </audio>
 
-  <!-- SCRIPT -->
   <script>
     (() => {
       const password = "deltarune";
-      
-      // Get elements
-      const loginBtn = document.getElementById("loginBtn");
-      const encryptBtn = document.getElementById("encryptBtn");
-      const decryptBtn = document.getElementById("decryptBtn");
+      let encryptionDateMultiplier = null; // Store multiplier globally
 
-      // Handle login button click event
-      loginBtn.addEventListener("click", () => {
-        handleLogin();
-      });
-
-      // Handle Enter key press in the password input
-      document.getElementById("password").addEventListener("keydown", (event) => {
+      // Handle the login functionality
+      document.getElementById("loginButton").addEventListener("click", login);
+      document.getElementById("password").addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
-          handleLogin();
+          login();
         }
       });
 
-      // Function to handle login
-      function handleLogin() {
+      function login() {
         const enteredPassword = document.getElementById("password").value;
         if (enteredPassword === password) {
           document.getElementById("login").style.display = "none";
@@ -111,46 +100,54 @@
         }
       }
 
-      // Handle encryption button click event
-      encryptBtn.addEventListener("click", () => {
-        const input = document.getElementById("inputText").value.toLowerCase().trim();
-        const words = input.split(/\s+/);
-        const encrypted = words.map(word => toMarcianBinary(word)).join("-");
-        document.getElementById("output").innerText = encrypted;
-      });
-
-      // Handle decryption button click event
-      decryptBtn.addEventListener("click", () => {
-        const input = document.getElementById("inputText").value.trim();
-        const segments = input.split("-");
-        const decrypted = segments.map(seg => fromMarcianBinary(seg)).join(" ");
-        document.getElementById("output").innerText = decrypted;
-      });
-
-      // Function to convert word to Marcian Binary format
+      // Helper functions for Marcian Cipher
       function toMarcianBinary(word) {
         const base36 = parseInt(word, 36).toString(2);
         let padded = base36;
-        while (padded.length % 5 !== 0) padded += "0";
+        while (padded.length % 5 !== 0) padded += "0"; // Pad to make the binary divisible by 5
 
         const parts = [];
         for (let i = 0; i < padded.length; i += 5) {
           parts.push(parseInt(padded.substring(i, i + 5), 2));
         }
 
+        // Use the date's day to multiply (ensure the multiplier is consistent for both encrypt and decrypt)
         const dateMultiplier = new Date().getDate();
+        encryptionDateMultiplier = dateMultiplier; // Store this value globally
         return parts.map(p => p * dateMultiplier).join(".");
       }
 
-      // Function to convert Marcian Binary back to original word
       function fromMarcianBinary(code) {
-        const dateMultiplier = new Date().getDate();
+        // Ensure the same multiplier used for encryption
+        const dateMultiplier = encryptionDateMultiplier || new Date().getDate();
         const nums = code.split(".").map(n => parseInt(n) / dateMultiplier);
+
         const binary = nums.map(n => n.toString(2).padStart(5, '0')).join("");
-        const trimmed = binary.replace(/0+$/, '');
+        const trimmed = binary.replace(/0+$/, ''); // Remove trailing zeros
         const decimal = parseInt(trimmed, 2);
-        return decimal.toString(36);
+        return decimal.toString(36); // Convert back to base 36
       }
+
+      // Encrypt text
+      function encrypt() {
+        const input = document.getElementById("inputText").value.toLowerCase();
+        const words = input.split(" ");
+        const encrypted = words.map(word => toMarcianBinary(word)).join("-");
+        document.getElementById("output").innerText = encrypted;
+      }
+
+      // Decrypt text
+      function decrypt() {
+        const input = document.getElementById("inputText").value;
+        const segments = input.split("-");
+        const decrypted = segments.map(seg => fromMarcianBinary(seg)).join(" ");
+        document.getElementById("output").innerText = decrypted;
+      }
+
+      // Expose functions globally
+      window.login = login;
+      window.encrypt = encrypt;
+      window.decrypt = decrypt;
     })();
   </script>
 </body>
